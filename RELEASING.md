@@ -32,7 +32,8 @@ tags. Rust crate versions are independent; all six npm versions must match.
 
 The tag workflow validates the tagged commit, builds five native targets,
 stages exact-version optional dependencies, packs and checks six tarballs,
-and checks installation on Node 22/24/26. Only the final publish job gets OIDC.
+and checks installation on Node 22 across all five platforms, plus Node 24/26
+on Linux x64. Only the final publish job gets OIDC.
 Native packages publish first; the CLI publishes only after their integrity is
 verified. Post-publication npx checks verify real platform selection.
 
