@@ -1,8 +1,8 @@
 name: CI
 on:
-  push:
-    branches: ['**']
+  # PRs into rust run this workflow through Release packages instead.
   pull_request:
+    branches: [main, rust-core]
   workflow_call:
 permissions:
   contents: read
@@ -48,6 +48,7 @@ jobs:
       - run: cargo test --manifest-path crates/core/Cargo.toml --locked
       - run: pnpm build
       - run: pnpm typecheck
+        if: matrix.target == 'x86_64-unknown-linux-gnu'
       - run: pnpm lint
         if: matrix.target == 'x86_64-unknown-linux-gnu'
       - run: pnpm test
