@@ -1,16 +1,23 @@
 {
-  "name": "mytokens",
-  "version": "1.3.4",
+  "name": "aiusage",
+  "version": "0.1.0",
+  "description": "Local coding-agent usage and cost reports, powered by Rust",
   "type": "module",
   "packageManager": "pnpm@12.15.0",
   "engines": {
     "node": ">=22.13.0"
   },
   "bin": {
-    "mytokens": "dist/index.js"
+    "aiusage": "dist/index.js"
+  },
+  "files": ["dist", "native/binding.cjs", "native/binding.d.cts"],
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
   },
   "napi": {
-    "binaryName": "mytokens-core",
+    "binaryName": "aiusage-core",
+    "packageName": "@shanthropic/aiusage",
     "targets": [
       "x86_64-apple-darwin",
       "aarch64-apple-darwin",
@@ -21,7 +28,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/NazmusSayad/mytokens.git"
+    "url": "git+https://github.com/shanthropic/aiusage.git"
   },
   "scripts": {
     "prepare": "husky",

@@ -87,7 +87,7 @@ export function attachExportCommands<
     )
     .option(
       '--output <path>',
-      'Output file path. Defaults to mytokens.svg (or the chosen format).'
+      'Output file path. Defaults to aiusage.svg (or the chosen format).'
     )
     .option(
       '-f, --format <format>',
@@ -130,12 +130,12 @@ export function attachExportCommands<
     )
     .on('--help', () => {
       console.log('\nExamples:')
-      console.log('  $ mytokens export')
-      console.log('  $ mytokens export --last 30 --output overview.svg')
-      console.log('  $ mytokens export --from 2026-01-01 --to 2026-03-01')
-      console.log('  $ mytokens export --format png')
-      console.log('  $ mytokens export --format png --output overview.png')
-      console.log('  $ mytokens export --theme dark --format png --scale 2')
+      console.log('  $ aiusage export')
+      console.log('  $ aiusage export --last 30 --output overview.svg')
+      console.log('  $ aiusage export --from 2026-01-01 --to 2026-03-01')
+      console.log('  $ aiusage export --format png')
+      console.log('  $ aiusage export --format png --output overview.png')
+      console.log('  $ aiusage export --theme dark --format png --scale 2')
     })
     .action(async (options: ExportCommandOptions) => {
       try {
@@ -193,18 +193,18 @@ export function attachExportCommands<
     )
     .on('--help', () => {
       console.log('\nExamples:')
-      console.log('  $ mytokens image')
-      console.log('  $ mytokens image --this-month')
-      console.log('  $ mytokens image --last 5')
-      console.log('  $ mytokens image --theme one-dark')
-      console.log('  $ mytokens image --copy')
+      console.log('  $ aiusage image')
+      console.log('  $ aiusage image --this-month')
+      console.log('  $ aiusage image --last 5')
+      console.log('  $ aiusage image --theme one-dark')
+      console.log('  $ aiusage image --copy')
     })
     .action(async (imageOptions: ImageCommandOptions) => {
       try {
         if (!process.stdout.isTTY) {
           console.warn(
             chalk.yellow(
-              'stdout is not a TTY; run `mytokens export` to save the SVG file instead.'
+              'stdout is not a TTY; run `aiusage export` to save the SVG file instead.'
             )
           )
           return
@@ -227,7 +227,7 @@ export function attachExportCommands<
         )
         console.log(
           `${chalk.bgYellow.dim.white(' WARN ')} ${chalk.dim.yellow(
-            'If your terminal fails to render the image, run `mytokens export` to export it and view it normally.'
+            'If your terminal fails to render the image, run `aiusage export` to export it and view it normally.'
           )}`
         )
       } catch (err) {
@@ -298,8 +298,8 @@ function resolveOutput(
   }
 
   if (format) {
-    return { outputPath: `mytokens.${format}`, format }
+    return { outputPath: `aiusage.${format}`, format }
   }
 
-  return { outputPath: 'mytokens.svg', format: 'svg' }
+  return { outputPath: 'aiusage.svg', format: 'svg' }
 }

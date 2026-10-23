@@ -7,3 +7,7 @@ crates/core/target/
 npm/
 artifacts/
 *.tgz
+release-stage/
+tarballs/
+aiusage.png
+aiusage.svg
