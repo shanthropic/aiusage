@@ -1,68 +1,56 @@
-# mytokens
+# aiusage
 
-`mytokens` is a small CLI that reads your local OpenCode SQLite history, matches models against the OpenRouter model catalog, and prints a readable usage + cost report.
+Local coding-agent usage and estimated cost reports, powered by Rust.
+Forked from [NazmusSayad/mytokens](https://github.com/NazmusSayad/mytokens).
 
-<img width="3838" height="733" alt="image" src="https://github.com/user-attachments/assets/de6b99ec-748c-4631-91f2-17ca780eed57" />
+## Run
 
-## What it does
+Once published:
 
-- Reads usage rows from your OpenCode database (`part` + `message` tables).
-- Fetches live model pricing from `https://openrouter.ai/api/v1/models`.
-- Matches local model names to OpenRouter model IDs with fuzzy matching.
-- Calculates estimated USD cost per model per day.
-
-## Install
-
-Use it directly from npm (no cloning/building needed):
-
-```bash
-npx mytokens
+```sh
+npx aiusage
 ```
 
-Or install globally:
+Or install globally with `npm install -g aiusage`.
+Node.js 22.13+ is required. npm installs only the matching parser binary from
+`@shanthropic`; users do not need Rust or a compiler. PNG/image support also
+installs the matching `@resvg/resvg-js` binary.
 
-```bash
-npm i -g mytokens
-mytokens
-```
+Supported platforms: Windows x64 (MSVC), macOS Intel/Apple Silicon, and Linux
+x64/ARM64 with glibc 2.35+. Alpine/musl, Windows ARM64, and 32-bit systems are
+not supported. CI validates on the documented GitHub-hosted runners; older OS
+compatibility is not guaranteed.
 
 ## Usage
 
-Run with default database path:
-
-```bash
-npx mytokens
+```sh
+aiusage --help
+aiusage --last 30
+aiusage --screen models-by-tokens --month
+aiusage export --format png --output overview.png
+aiusage cache --help
 ```
 
-You can also pass your database file as the first CLI argument, or set `OPENCODE_DB_PATH`.
+Reads local history from 21 coding-agent sources, including Claude Code, Codex,
+and OpenCode. Model pricing comes from [models.dev](https://models.dev).
+Reports are estimates, not billing statements. Network access is needed to
+refresh pricing and model groups.
 
-Default DB path if no argument/env is provided:
+Configuration and caches remain in `~/.mytokens` for compatibility with the
+original CLI. `--fresh` bypasses the parse cache; `--no-cache` refreshes remote
+data. No history-directory migration is performed.
 
-```text
-~/.local/share/opencode/opencode.db
-```
+## Development and releases
 
-## Output
+Rust parsers and the bundled SQLite cache live in `crates/core`. The adapter in
+`src/native.ts` loads NAPI-generated bindings from `native/`; JS output lives
+in `dist/`. Toolchain versions and dependency locks are committed.
 
-The CLI prints three tables:
+All builds, existing tests, package validation, and size measurements run in
+GitHub Actions. See [RELEASING.md](RELEASING.md) for bootstrap, OIDC, and recovery.
 
-- `Daily Usage/Model`: token usage and estimated cost by date + model.
-- `Daily Usage/Provider`: token usage and estimated cost by date + provider.
-- `Daily Total Usage`: models used, token totals, and total cost by date.
+Branch flow is `main` → `rust-core` → `rust`: generic Rust work stays on
+`rust-core`, fork branding and npm publication stay on `rust`.
 
-## Requirements
-
-- Node.js 22.13+
-- Access to your OpenCode SQLite database
-- Network access to OpenRouter models endpoint
-
-## Native development
-
-The usage parsers and SQLite parse cache live in `crates/core`; `src/native.ts`
-adapts their NAPI-RS exports to the CLI. Rust and a C compiler are needed to build
-from source (SQLite is bundled). The Rust toolchain and pnpm version are pinned.
-
-GitHub Actions builds the addon and CLI on Linux x64/ARM64, macOS x64/ARM64,
-and Windows x64, then runs the existing Rust and TypeScript tests. Generated
-bindings and binaries live in `native/`, outside the JS build's `dist/` directory.
-Cache and configuration files continue to use `~/.mytokens`.
+Publication is blocked until redistribution permission and license notices
+are supplied. No license is inferred from the upstream repository.
