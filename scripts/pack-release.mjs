@@ -4,11 +4,11 @@ import { appendFileSync, copyFileSync, cpSync, mkdirSync, readFileSync, readdirS
 import { resolve } from 'node:path'
 
 const pkg = JSON.parse(readFileSync('package.json', 'utf8'))
-assert.equal(pkg.name, 'aiusage')
+assert.equal(pkg.name, 'tokenstat')
 assert.match(pkg.version, /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/)
-assert.equal(pkg.napi.packageName, '@shanthropic/aiusage')
-assert.equal(pkg.napi.binaryName, 'aiusage-core')
-assert.equal(pkg.repository.url, 'git+https://github.com/shanthropic/aiusage.git')
+assert.equal(pkg.napi.packageName, '@shanthropic/tokenstat')
+assert.equal(pkg.napi.binaryName, 'tokenstat-core')
+assert.equal(pkg.repository.url, 'git+https://github.com/shanthropic/tokenstat.git')
 const stage = resolve('release-stage')
 const output = resolve('tarballs')
 mkdirSync(stage)
@@ -39,7 +39,7 @@ const packages = []
 for (const dir of [...dirs.map(dir => `${stage}/npm/${dir}`), stage]) {
   const manifest = JSON.parse(readFileSync(`${dir}/package.json`, 'utf8'))
   if (dir !== stage) {
-    assert.equal(manifest.name, `@shanthropic/aiusage-${dir.split('/').at(-1)}`)
+    assert.equal(manifest.name, `@shanthropic/tokenstat-${dir.split('/').at(-1)}`)
     assert.equal(manifest.version, pkg.version)
     assert.equal(staged.optionalDependencies[manifest.name], pkg.version)
     assert.equal(manifest.cpu.length, 1)

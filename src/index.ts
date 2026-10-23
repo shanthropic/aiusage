@@ -30,7 +30,7 @@ type DashboardCommandOptions = UsageFilterOptionValues & {
   cache?: boolean
 }
 
-const program = new Command('aiusage')
+const program = new Command('tokenstat')
   .description('CLI tool to see detailed all the coding cli usage')
   .argument(
     '[screen]',

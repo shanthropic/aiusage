@@ -1,5 +1,5 @@
 {
-  "name": "aiusage",
+  "name": "tokenstat",
   "version": "0.1.0",
   "description": "Local coding-agent usage and cost reports, powered by Rust",
   "type": "module",
@@ -9,7 +9,7 @@
     "node": ">=22.13.0"
   },
   "bin": {
-    "aiusage": "dist/index.js"
+    "tokenstat": "dist/index.js"
   },
   "files": ["dist", "native/binding.cjs", "native/binding.d.cts"],
   "publishConfig": {
@@ -17,8 +17,8 @@
     "registry": "https://registry.npmjs.org/"
   },
   "napi": {
-    "binaryName": "aiusage-core",
-    "packageName": "@shanthropic/aiusage",
+    "binaryName": "tokenstat-core",
+    "packageName": "@shanthropic/tokenstat",
     "targets": [
       "x86_64-apple-darwin",
       "aarch64-apple-darwin",
@@ -29,7 +29,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/shanthropic/aiusage.git"
+    "url": "git+https://github.com/shanthropic/tokenstat.git"
   },
   "scripts": {
     "prepare": "husky",
