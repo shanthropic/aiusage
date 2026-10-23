@@ -2,6 +2,7 @@ import assert from 'node:assert/strict'
 import { execFileSync } from 'node:child_process'
 import { createHash } from 'node:crypto'
 import { readFileSync } from 'node:fs'
+import { resolve } from 'node:path'
 
 const release = JSON.parse(readFileSync('tarballs/manifest.json', 'utf8'))
 assert.equal(process.env.GITHUB_REPOSITORY, 'shanthropic/tokenstat')
@@ -21,7 +22,9 @@ async function metadata(spec) {
 for (const pkg of release.packages) {
   assert.equal(pkg.version, release.version)
   assert.match(pkg.filename, /^[a-z0-9.-]+\.tgz$/)
-  const integrity = 'sha512-' + createHash('sha512').update(readFileSync(`tarballs/${pkg.filename}`)).digest('base64')
+  // Absolute path: npm reads slashed relative specs as GitHub references.
+  const file = resolve('tarballs', pkg.filename)
+  const integrity = 'sha512-' + createHash('sha512').update(readFileSync(file)).digest('base64')
   assert.equal(integrity, pkg.integrity)
   const existing = await metadata(`${encodeURIComponent(pkg.name)}/${pkg.version}`)
   if (existing) assert.equal(existing.dist.integrity, pkg.integrity, `Published bits differ for ${pkg.name}`)
@@ -36,7 +39,7 @@ if (latest) {
 for (const pkg of release.packages) {
   const spec = `${encodeURIComponent(pkg.name)}/${pkg.version}`
   if (!(await metadata(spec))) {
-    execFileSync('npm', ['publish', `tarballs/${pkg.filename}`, '--access', 'public', '--ignore-scripts'], { stdio: 'inherit' })
+    execFileSync('npm', ['publish', resolve('tarballs', pkg.filename), '--access', 'public', '--ignore-scripts'], { stdio: 'inherit' })
   }
   const published = await metadata(spec)
   assert.equal(published?.dist.integrity, pkg.integrity, `Registry verification failed for ${pkg.name}; rerun this publishing job`)
