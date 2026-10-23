@@ -18,7 +18,8 @@ export async function copyPngToClipboard(png: Uint8Array) {
     await writeFile(imagePath, png)
     await execFile('osascript', [
       '-e',
-      `set the clipboard to (read (POSIX file "${imagePath}") as «class PNGf»)`,
+      'on run argv\nset the clipboard to (read (POSIX file (item 1 of argv)) as «class PNGf»)\nend run',
+      imagePath,
     ])
   } finally {
     await rm(directory, { force: true, recursive: true })
