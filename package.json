@@ -1,6 +1,6 @@
 {
   "name": "tokenstat",
-  "version": "0.1.2",
+  "version": "0.1.1",
   "description": "Local coding-agent usage and cost reports, powered by Rust",
   "type": "module",
   "main": "native/binding.cjs",
