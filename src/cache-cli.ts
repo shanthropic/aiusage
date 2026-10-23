@@ -5,7 +5,7 @@ import {
   clearFileMessagesCache,
   getFileMessagesCacheInfo,
   listFileMessagesCache,
-} from './helpers/parse-cache.js'
+} from './native.js'
 
 function formatBytes(bytes: number): string {
   if (bytes >= 1024 * 1024) return `${(bytes / (1024 * 1024)).toFixed(1)} MB`

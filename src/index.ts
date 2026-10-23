@@ -7,13 +7,13 @@ import { attachCacheCommands } from './cache-cli.js'
 import { APP_SCREENS_MAP, AppScreenType } from './constants/screen.js'
 import { attachExportCommands } from './export/cli.js'
 import { parseScreenArg, resolveBy } from './helpers/args.js'
-import { disableFileMessagesCache } from './helpers/parse-cache.js'
 import { pickScreen } from './helpers/picker.js'
 import {
   addUsageFilterOptions,
   buildUsageFilterOptions,
   UsageFilterOptionValues,
 } from './helpers/usage-options.js'
+import { disableFileMessagesCache } from './native.js'
 import { RenderValueShowBy } from './render/types.js'
 
 type DashboardCommandOptions = UsageFilterOptionValues & {
