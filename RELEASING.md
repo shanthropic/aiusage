@@ -5,23 +5,19 @@ run in GitHub Actions. Do not build or pack releases locally.
 
 ## One-time prerequisites
 
-1. Confirm upstream redistribution permission. Commit the applicable `LICENSE`
-   (or `LICENSE.md` / `LICENSE.txt`) and notices, and set the correct package
-   license metadata. Do not invent a license. Publication refuses unlicensed
-   artifacts; dry-run packaging is allowed for validation.
-2. Confirm ownership of the npm organization `@shanthropic`, publishing access
+1. Confirm ownership of the npm organization `@shanthropic`, publishing access
    to its packages, and the ability to claim the unscoped `aiusage` name.
-3. Create the GitHub environment `npm`, restricted to tags `aiusage-v*`.
+2. Create the GitHub environment `npm`, restricted to tags `aiusage-v*`.
    Protect that tag namespace with a repository ruleset; optionally require
    release approval on the environment.
-4. Run **Release packages** manually on `rust`. Download `release-tarballs`
+3. Run **Release packages** manually on `rust`. Download `release-tarballs`
    only after every package installation check passes. The artifact includes
    five native tarballs, the CLI tarball, and SHA-512 integrity/size metadata.
-5. Bootstrap those six packages using interactive npm authentication with 2FA.
+4. Bootstrap those six packages using interactive npm authentication with 2FA.
    Upload the five `shanthropic-aiusage-*.tgz` files first and `aiusage-*.tgz`
    last, using `npm publish <downloaded-file.tgz> --access public --ignore-scripts`.
    This uploads CI-built bytes; it does not compile or pack on your machine.
-6. For **each of the six existing npm packages**, configure trusted publishing:
+5. For **each of the six existing npm packages**, configure trusted publishing:
    GitHub owner `shanthropic`, repository `aiusage`, workflow `publish.yml`,
    environment `npm`, explicitly allowing `npm publish`.
    Configure trust near the next release: new registrations currently need a

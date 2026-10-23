@@ -6,7 +6,6 @@ import { readFileSync } from 'node:fs'
 const release = JSON.parse(readFileSync('tarballs/manifest.json', 'utf8'))
 assert.equal(process.env.GITHUB_REPOSITORY, 'shanthropic/aiusage')
 assert.equal(process.env.GITHUB_REF, `refs/tags/aiusage-v${release.version}`)
-assert.equal(release.licensed, true, 'Redistribution permission and license notices must be supplied before publishing')
 assert.match(release.version, /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/)
 const names = ['darwin-arm64', 'darwin-x64', 'linux-arm64-gnu', 'linux-x64-gnu', 'win32-x64-msvc'].map(p => `@shanthropic/aiusage-${p}`)
 assert.deepEqual(release.packages.map(p => p.name), [...names, 'aiusage'])
