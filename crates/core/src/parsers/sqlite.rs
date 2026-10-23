@@ -1166,7 +1166,7 @@ mod tests {
             fs::create_dir_all(&c_proj).unwrap();
             fs::write(
                 c_share.join("projects.json"),
-                format!(r#"[{{"path":"{}"}}]"#, c_proj.display()),
+                serde_json::json!([{ "path": c_proj }]).to_string(),
             )
             .unwrap();
             let conn = Connection::open(c_proj.join("crush.db")).unwrap();
