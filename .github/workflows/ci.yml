@@ -1,0 +1,60 @@
+name: CI
+on:
+  push:
+    branches: ['**']
+  pull_request:
+  workflow_call:
+permissions:
+  contents: read
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ !startsWith(github.ref, 'refs/tags/') }}
+jobs:
+  native:
+    name: Native (${{ matrix.target }})
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: ubuntu-22.04
+            target: x86_64-unknown-linux-gnu
+          - runner: ubuntu-22.04-arm
+            target: aarch64-unknown-linux-gnu
+          - runner: macos-15-intel
+            target: x86_64-apple-darwin
+          - runner: macos-15
+            target: aarch64-apple-darwin
+          - runner: windows-2025
+            target: x86_64-pc-windows-msvc
+    runs-on: ${{ matrix.runner }}
+    env:
+      HUSKY: '0'
+      CARGO_TERM_COLOR: always
+      RUST_TEST_THREADS: '1'
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24.22.1
+      - uses: pnpm/action-setup@d9184bf108216479bc5a137cc391f4d7b14c870b # v6.1.0
+      - run: pnpm install --frozen-lockfile
+      - run: cargo fmt --manifest-path crates/core/Cargo.toml --check
+        if: matrix.target == 'x86_64-unknown-linux-gnu'
+      - run: cargo clippy --manifest-path crates/core/Cargo.toml --locked --all-targets
+        if: matrix.target == 'x86_64-unknown-linux-gnu'
+      - run: cargo test --manifest-path crates/core/Cargo.toml --locked
+      - run: pnpm build
+      - run: pnpm typecheck
+      - run: pnpm lint
+        if: matrix.target == 'x86_64-unknown-linux-gnu'
+      - run: pnpm test
+      - run: node dist/index.js --help
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: native-${{ matrix.target }}
+          path: native/
+          if-no-files-found: error
+          retention-days: 7

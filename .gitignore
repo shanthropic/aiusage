@@ -2,3 +2,8 @@ dist
 node_modules
 mytokens.png
 mytokens.svg
+native/
+crates/core/target/
+npm/
+artifacts/
+*.tgz
