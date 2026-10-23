@@ -51,6 +51,3 @@ GitHub Actions. See [RELEASING.md](RELEASING.md) for bootstrap, OIDC, and recove
 
 Branch flow is `main` → `rust-core` → `rust`: generic Rust work stays on
 `rust-core`, fork branding and npm publication stay on `rust`.
-
-Publication is blocked until redistribution permission and license notices
-are supplied. No license is inferred from the upstream repository.

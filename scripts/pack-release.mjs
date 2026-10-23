@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import { execFileSync } from 'node:child_process'
-import { appendFileSync, copyFileSync, cpSync, existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs'
+import { appendFileSync, copyFileSync, cpSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 
 const pkg = JSON.parse(readFileSync('package.json', 'utf8'))
@@ -20,8 +20,6 @@ for (const name of ['binding.cjs', 'binding.d.cts']) {
   copyFileSync(`artifacts/native-x86_64-unknown-linux-gnu/${name}`, `${stage}/native/${name}`)
 }
 copyFileSync('README.md', `${stage}/README.md`)
-const licenses = ['LICENSE', 'LICENSE.md', 'LICENSE.txt'].filter(existsSync)
-for (const name of licenses) copyFileSync(name, `${stage}/${name}`)
 delete pkg.devDependencies
 delete pkg.scripts
 delete pkg.packageManager
@@ -47,7 +45,6 @@ for (const dir of [...dirs.map(dir => `${stage}/npm/${dir}`), stage]) {
     assert.equal(manifest.cpu.length, 1)
     assert.equal(manifest.os.length, 1)
     if (manifest.os[0] === 'linux') assert.deepEqual(manifest.libc, ['glibc'])
-    for (const name of licenses) copyFileSync(name, `${dir}/${name}`)
   }
   const [packed] = JSON.parse(execFileSync('npm', ['pack', '--json', '--ignore-scripts', '--pack-destination', output], { cwd: dir, encoding: 'utf8' }))
   const binaries = packed.files.filter(file => file.path.endsWith('.node'))
@@ -56,13 +53,13 @@ for (const dir of [...dirs.map(dir => `${stage}/npm/${dir}`), stage]) {
     for (const name of ['dist/index.js', 'native/binding.cjs']) {
       assert(packed.files.some(file => file.path === name), `Missing ${name}`)
     }
-    assert(packed.files.every(file => /^(dist\/|native\/binding\.|package.json$|README.md$|LICENSE)/.test(file.path)))
+    assert(packed.files.every(file => /^(dist\/|native\/binding\.|package.json$|README.md$)/.test(file.path)))
   } else {
     assert.equal(binaries[0].path, manifest.main)
   }
   packages.push({ name: manifest.name, version: manifest.version, filename: packed.filename, integrity: packed.integrity, size: packed.size, unpackedSize: packed.unpackedSize })
 }
-writeFileSync(`${output}/manifest.json`, JSON.stringify({ version: pkg.version, licensed: licenses.length > 0, packages }, null, 2) + '\n')
+writeFileSync(`${output}/manifest.json`, JSON.stringify({ version: pkg.version, packages }, null, 2) + '\n')
 if (process.env.GITHUB_STEP_SUMMARY) {
   appendFileSync(process.env.GITHUB_STEP_SUMMARY, '| Package | Download bytes | Unpacked bytes |\n|---|---:|---:|\n' + packages.map(p => `| ${p.name} | ${p.size} | ${p.unpackedSize} |`).join('\n') + '\n')
 }
