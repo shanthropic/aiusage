@@ -13,7 +13,9 @@ export class RenderProjectsByCostsScreen extends RenderScreen {
   protected valueUnit: RenderValueUnit = 'dollar'
 
   protected async init() {
-    this.priceDetector = await initializePriceDetector()
+    this.priceDetector = await initializePriceDetector({
+      fresh: this.options.refetchRemote,
+    })
   }
 
   protected resolveItem(
