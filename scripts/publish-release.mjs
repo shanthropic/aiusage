@@ -4,11 +4,11 @@ import { createHash } from 'node:crypto'
 import { readFileSync } from 'node:fs'
 
 const release = JSON.parse(readFileSync('tarballs/manifest.json', 'utf8'))
-assert.equal(process.env.GITHUB_REPOSITORY, 'shanthropic/aiusage')
-assert.equal(process.env.GITHUB_REF, `refs/tags/aiusage-v${release.version}`)
+assert.equal(process.env.GITHUB_REPOSITORY, 'shanthropic/tokenstat')
+assert.equal(process.env.GITHUB_REF, `refs/tags/tokenstat-v${release.version}`)
 assert.match(release.version, /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/)
-const names = ['darwin-arm64', 'darwin-x64', 'linux-arm64-gnu', 'linux-x64-gnu', 'win32-x64-msvc'].map(p => `@shanthropic/aiusage-${p}`)
-assert.deepEqual(release.packages.map(p => p.name), [...names, 'aiusage'])
+const names = ['darwin-arm64', 'darwin-x64', 'linux-arm64-gnu', 'linux-x64-gnu', 'win32-x64-msvc'].map(p => `@shanthropic/tokenstat-${p}`)
+assert.deepEqual(release.packages.map(p => p.name), [...names, 'tokenstat'])
 
 async function metadata(spec) {
   const response = await fetch(`https://registry.npmjs.org/${spec}`)
@@ -26,7 +26,7 @@ for (const pkg of release.packages) {
   const existing = await metadata(`${encodeURIComponent(pkg.name)}/${pkg.version}`)
   if (existing) assert.equal(existing.dist.integrity, pkg.integrity, `Published bits differ for ${pkg.name}`)
 }
-const latest = await metadata('aiusage/latest')
+const latest = await metadata('tokenstat/latest')
 if (latest) {
   const current = latest.version.split('.').map(Number)
   const next = release.version.split('.').map(Number)

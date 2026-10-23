@@ -1,4 +1,4 @@
-# aiusage
+# tokenstat
 
 Local coding-agent usage and estimated cost reports, powered by Rust.
 Forked from [NazmusSayad/mytokens](https://github.com/NazmusSayad/mytokens).
@@ -8,10 +8,10 @@ Forked from [NazmusSayad/mytokens](https://github.com/NazmusSayad/mytokens).
 Once published:
 
 ```sh
-npx aiusage
+npx tokenstat
 ```
 
-Or install globally with `npm install -g aiusage`.
+Or install globally with `npm install -g tokenstat`.
 Node.js 22.13+ is required. npm installs only the matching parser binary from
 `@shanthropic`; users do not need Rust or a compiler. PNG/image support also
 installs the matching `@resvg/resvg-js` binary.
@@ -24,11 +24,11 @@ compatibility is not guaranteed.
 ## Usage
 
 ```sh
-aiusage --help
-aiusage --last 30
-aiusage --screen models-by-tokens --month
-aiusage export --format png --output overview.png
-aiusage cache --help
+tokenstat --help
+tokenstat --last 30
+tokenstat --screen models-by-tokens --month
+tokenstat export --format png --output overview.png
+tokenstat cache --help
 ```
 
 Reads local history from 21 coding-agent sources, including Claude Code, Codex,

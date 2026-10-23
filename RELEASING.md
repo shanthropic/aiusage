@@ -1,4 +1,4 @@
-# Releasing aiusage
+# Releasing tokenstat
 
 Builds, existing tests, package assembly, installation checks, and size reports
 run in GitHub Actions. Do not build or pack releases locally.
@@ -6,19 +6,19 @@ run in GitHub Actions. Do not build or pack releases locally.
 ## One-time prerequisites
 
 1. Confirm ownership of the npm organization `@shanthropic`, publishing access
-   to its packages, and the ability to claim the unscoped `aiusage` name.
-2. Create the GitHub environment `npm`, restricted to tags `aiusage-v*`.
+   to its packages, and the ability to claim the unscoped `tokenstat` name.
+2. Create the GitHub environment `npm`, restricted to tags `tokenstat-v*`.
    Protect that tag namespace with a repository ruleset; optionally require
    release approval on the environment.
 3. Run **Release packages** manually on `rust`. Download `release-tarballs`
    only after every package installation check passes. The artifact includes
    five native tarballs, the CLI tarball, and SHA-512 integrity/size metadata.
 4. Bootstrap those six packages using interactive npm authentication with 2FA.
-   Upload the five `shanthropic-aiusage-*.tgz` files first and `aiusage-*.tgz`
+   Upload the five `shanthropic-tokenstat-*.tgz` files first and `tokenstat-*.tgz`
    last, using `npm publish <downloaded-file.tgz> --access public --ignore-scripts`.
    This uploads CI-built bytes; it does not compile or pack on your machine.
 5. For **each of the six existing npm packages**, configure trusted publishing:
-   GitHub owner `shanthropic`, repository `aiusage`, workflow `publish.yml`,
+   GitHub owner `shanthropic`, repository `tokenstat`, workflow `publish.yml`,
    environment `npm`, explicitly allowing `npm publish`.
    Configure trust near the next release: new registrations currently need a
    first successful publication within two days. After OIDC works, disable
@@ -27,7 +27,7 @@ run in GitHub Actions. Do not build or pack releases locally.
 ## Normal releases
 
 Update `package.json` to a new stable `X.Y.Z` through a PR into `rust`.
-Tag that merged commit `aiusage-vX.Y.Z` and push the tag. Do not move release
+Tag that merged commit `tokenstat-vX.Y.Z` and push the tag. Do not move release
 tags. Rust crate versions are independent; all six npm versions must match.
 
 The tag workflow validates the tagged commit, builds five native targets,

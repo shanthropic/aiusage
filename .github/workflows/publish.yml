@@ -1,7 +1,7 @@
 name: Release packages
 on:
   push:
-    tags: ['aiusage-v*']
+    tags: ['tokenstat-v*']
   pull_request:
     branches: [rust]
   workflow_dispatch:
@@ -29,10 +29,10 @@ jobs:
           import assert from 'node:assert/strict'
           import { readFileSync } from 'node:fs'
           const p = JSON.parse(readFileSync('package.json'))
-          assert.equal(process.env.GITHUB_REPOSITORY, 'shanthropic/aiusage')
-          assert.equal(p.name, 'aiusage')
+          assert.equal(process.env.GITHUB_REPOSITORY, 'shanthropic/tokenstat')
+          assert.equal(p.name, 'tokenstat')
           assert.match(p.version, /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/)
-          if (process.env.GITHUB_REF.startsWith('refs/tags/')) assert.equal(process.env.RELEASE_TAG, `aiusage-v${p.version}`)
+          if (process.env.GITHUB_REF.startsWith('refs/tags/')) assert.equal(process.env.RELEASE_TAG, `tokenstat-v${p.version}`)
           JS
       - name: Require release commit on rust
         if: startsWith(github.ref, 'refs/tags/')
@@ -101,24 +101,24 @@ jobs:
           export USERPROFILE="$HOME"
           cd "$RUNNER_TEMP/consumer"
           npm init -y
-          npm install --ignore-scripts --no-audit --no-fund "$ROOT"/tarballs/aiusage-*.tgz "$ROOT"/tarballs/shanthropic-aiusage-"$PLATFORM"-*.tgz
-          npm exec --offline -- aiusage --help
-          npm exec --offline -- aiusage cache --help
+          npm install --ignore-scripts --no-audit --no-fund "$ROOT"/tarballs/tokenstat-*.tgz "$ROOT"/tarballs/shanthropic-tokenstat-"$PLATFORM"-*.tgz
+          npm exec --offline -- tokenstat --help
+          npm exec --offline -- tokenstat cache --help
           node --input-type=module <<'JS'
           import assert from 'node:assert/strict'
           import { readdirSync } from 'node:fs'
           import { createRequire } from 'node:module'
-          const require = createRequire(process.cwd() + '/node_modules/aiusage/package.json')
+          const require = createRequire(process.cwd() + '/node_modules/tokenstat/package.json')
           const p = require('./package.json')
-          assert.deepEqual(readdirSync('node_modules/@shanthropic'), [`aiusage-${process.env.PLATFORM}`])
-          assert.equal(require(`@shanthropic/aiusage-${process.env.PLATFORM}/package.json`).version, p.version)
+          assert.deepEqual(readdirSync('node_modules/@shanthropic'), [`tokenstat-${process.env.PLATFORM}`])
+          assert.equal(require(`@shanthropic/tokenstat-${process.env.PLATFORM}/package.json`).version, p.version)
           const { Resvg } = require('@resvg/resvg-js')
           assert(new Resvg('<svg xmlns="http://www.w3.org/2000/svg" width="1" height="1"/>').render().asPng().length > 0)
           JS
           du -sk node_modules "$npm_config_cache" >> "$GITHUB_STEP_SUMMARY"
   publish:
     needs: install
-    if: github.repository == 'shanthropic/aiusage' && startsWith(github.ref, 'refs/tags/aiusage-v')
+    if: github.repository == 'shanthropic/tokenstat' && startsWith(github.ref, 'refs/tags/tokenstat-v')
     runs-on: ubuntu-22.04
     environment: npm
     permissions:
@@ -163,8 +163,8 @@ jobs:
           PLATFORM: ${{ matrix.name }}
           npm_config_cache: ${{ runner.temp }}/registry-cache
         run: |
-          VERSION="${TAG#aiusage-v}"
-          npx --yes "aiusage@$VERSION" --help
-          find "$npm_config_cache/_npx" -path '*/node_modules/@shanthropic/aiusage-*/package.json' > installed.txt
+          VERSION="${TAG#tokenstat-v}"
+          npx --yes "tokenstat@$VERSION" --help
+          find "$npm_config_cache/_npx" -path '*/node_modules/@shanthropic/tokenstat-*/package.json' > installed.txt
           test "$(wc -l < installed.txt | tr -d ' ')" = 1
-          grep -F "/aiusage-$PLATFORM/package.json" installed.txt
+          grep -F "/tokenstat-$PLATFORM/package.json" installed.txt
