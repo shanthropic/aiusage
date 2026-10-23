@@ -52,6 +52,17 @@ The CLI prints three tables:
 
 ## Requirements
 
-- Node.js 18+
+- Node.js 22.13+
 - Access to your OpenCode SQLite database
 - Network access to OpenRouter models endpoint
+
+## Native development
+
+The usage parsers and SQLite parse cache live in `crates/core`; `src/native.ts`
+adapts their NAPI-RS exports to the CLI. Rust and a C compiler are needed to build
+from source (SQLite is bundled). The Rust toolchain and pnpm version are pinned.
+
+GitHub Actions builds the addon and CLI on Linux x64/ARM64, macOS x64/ARM64,
+and Windows x64, then runs the existing Rust and TypeScript tests. Generated
+bindings and binaries live in `native/`, outside the JS build's `dist/` directory.
+Cache and configuration files continue to use `~/.mytokens`.
