@@ -1,10 +1,10 @@
-use crate::common::{home_dir, RawUsageMessage};
+use crate::common::{RawUsageMessage, home_dir};
 use napi_derive::napi;
-use rusqlite::{params, Connection};
+use rusqlite::{Connection, params};
 use std::fs;
 use std::path::{Path, PathBuf};
-use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Mutex;
+use std::sync::atomic::{AtomicBool, Ordering};
 use std::time::UNIX_EPOCH;
 
 static CACHE_DISABLED: AtomicBool = AtomicBool::new(false);
@@ -203,12 +203,11 @@ pub fn list_cache() -> Vec<FileMessagesCacheEntry> {
     let Some(conn) = open_cache_db() else {
         return Vec::new();
     };
-    let mut stmt = match conn
-        .prepare("SELECT path, msg_count, byte_size FROM file_cache ORDER BY path ASC")
-    {
-        Ok(s) => s,
-        Err(_) => return Vec::new(),
-    };
+    let mut stmt =
+        match conn.prepare("SELECT path, msg_count, byte_size FROM file_cache ORDER BY path ASC") {
+            Ok(s) => s,
+            Err(_) => return Vec::new(),
+        };
     let rows = match stmt.query_map([], |row| {
         Ok(FileMessagesCacheEntry {
             path: row.get::<_, String>(0)?,

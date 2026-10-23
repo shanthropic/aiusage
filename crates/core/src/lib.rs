@@ -3,8 +3,8 @@ pub mod common;
 pub mod parsers;
 
 use cache::{
-    cache_info, clear_cache, list_cache, prune_cache_if_needed, set_cache_disabled,
-    FileMessagesCacheEntry, FileMessagesCacheInfo,
+    FileMessagesCacheEntry, FileMessagesCacheInfo, cache_info, clear_cache, list_cache,
+    prune_cache_if_needed, set_cache_disabled,
 };
 use common::{DateRange, RawUsageMessage};
 use napi::bindgen_prelude::*;

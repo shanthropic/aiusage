@@ -1,9 +1,9 @@
 use crate::cache::cached_file_messages;
 use crate::common::{
-    build_raw_message, derive_agent, extract_i64, extract_string, file_modified_timestamp_ms,
-    file_predates_range, filter_messages_by_date_range, normalize_agent_name, normalize_tokens,
-    normalize_workspace_key, parse_timestamp_value, resolve_home, scan_directory,
-    workspace_label_from_key, DateRange, RawUsageMessage, Tokens,
+    DateRange, RawUsageMessage, Tokens, build_raw_message, derive_agent, extract_i64,
+    extract_string, file_modified_timestamp_ms, file_predates_range, filter_messages_by_date_range,
+    normalize_agent_name, normalize_tokens, normalize_workspace_key, parse_timestamp_value,
+    resolve_home, scan_directory, workspace_label_from_key,
 };
 use memchr::memmem;
 use rayon::prelude::*;
@@ -22,8 +22,7 @@ struct AgentMetaFile {
 }
 
 pub fn parse_claude(range: DateRange) -> Vec<RawUsageMessage> {
-    let parent_cache: Mutex<HashMap<PathBuf, HashMap<String, String>>> =
-        Mutex::new(HashMap::new());
+    let parent_cache: Mutex<HashMap<PathBuf, HashMap<String, String>>> = Mutex::new(HashMap::new());
 
     let mut files = vec![
         resolve_home("~/.claude/usage.jsonl"),
@@ -35,9 +34,7 @@ pub fn parse_claude(range: DateRange) -> Vec<RawUsageMessage> {
     let messages: Vec<RawUsageMessage> = files
         .into_par_iter()
         .filter(|p| p.exists() && !file_predates_range(p, range))
-        .flat_map(|path| {
-            cached_file_messages(&path, || parse_claude_file(&path, &parent_cache))
-        })
+        .flat_map(|path| cached_file_messages(&path, || parse_claude_file(&path, &parent_cache)))
         .collect();
 
     filter_messages_by_date_range(messages, range)
@@ -423,11 +420,7 @@ fn extract_agent_id_from_text(text: &str) -> Option<String> {
         .chars()
         .take_while(|c| c.is_ascii_alphanumeric())
         .collect();
-    if id.is_empty() {
-        None
-    } else {
-        Some(id)
-    }
+    if id.is_empty() { None } else { Some(id) }
 }
 
 #[derive(Default)]
@@ -538,10 +531,12 @@ fn extract_claude_headless_message(
 }
 
 fn extract_claude_model(value: &serde_json::Map<String, Value>) -> Option<String> {
-    value
-        .get("model")
-        .and_then(extract_string)
-        .or_else(|| value.get("message").and_then(|m| m.get("model")).and_then(extract_string))
+    value.get("model").and_then(extract_string).or_else(|| {
+        value
+            .get("message")
+            .and_then(|m| m.get("model"))
+            .and_then(extract_string)
+    })
 }
 
 fn extract_claude_timestamp(value: &serde_json::Map<String, Value>) -> Option<f64> {
@@ -658,7 +653,10 @@ mod tests {
     #[test]
     fn detects_workspace_and_prefers_cwd_over_encoded_project_dir() {
         with_temp_home(|home| {
-            let project_dir = home.join(".claude").join("projects").join("C--Users-test-Desktop");
+            let project_dir = home
+                .join(".claude")
+                .join("projects")
+                .join("C--Users-test-Desktop");
             fs::create_dir_all(&project_dir).unwrap();
             fs::write(
                 project_dir.join("session.jsonl"),
@@ -668,7 +666,10 @@ mod tests {
 
             let res = parse_claude(DateRange::default());
             assert_eq!(res.len(), 1);
-            assert_eq!(res[0].project_path.as_deref(), Some("C:/Users/test/Desktop"));
+            assert_eq!(
+                res[0].project_path.as_deref(),
+                Some("C:/Users/test/Desktop")
+            );
             assert_eq!(res[0].project_name.as_deref(), Some("Desktop"));
         });
     }

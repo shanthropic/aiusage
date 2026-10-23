@@ -1,8 +1,8 @@
 use crate::cache::cached_file_messages;
 use crate::common::{
-    build_raw_message, derive_agent, extract_i64, file_predates_range,
+    DateRange, RawUsageMessage, build_raw_message, derive_agent, extract_i64, file_predates_range,
     filter_messages_by_date_range, infer_provider_from_model, normalize_tokens,
-    parse_timestamp_value, resolve_home, scan_directory, DateRange, RawUsageMessage,
+    parse_timestamp_value, resolve_home, scan_directory,
 };
 use rayon::prelude::*;
 use serde::Deserialize;
@@ -90,7 +90,10 @@ fn parse_roo_kilo_file(path: &Path, source_name: &str) -> Vec<RawUsageMessage> {
         let tokens_in = payload.get("tokensIn").and_then(extract_i64).unwrap_or(0);
         let tokens_out = payload.get("tokensOut").and_then(extract_i64).unwrap_or(0);
         let cache_reads = payload.get("cacheReads").and_then(extract_i64).unwrap_or(0);
-        let cache_writes = payload.get("cacheWrites").and_then(extract_i64).unwrap_or(0);
+        let cache_writes = payload
+            .get("cacheWrites")
+            .and_then(extract_i64)
+            .unwrap_or(0);
         let provider = payload
             .get("apiProtocol")
             .and_then(|v| v.as_str())
@@ -221,8 +224,8 @@ mod tests {
             assert!(parse_roocode(DateRange::default()).is_empty());
             assert!(parse_kilocode(DateRange::default()).is_empty());
 
-            let roo_dir = home
-                .join(".config/Code/User/globalStorage/rooveterinaryinc.roo-cline/tasks");
+            let roo_dir =
+                home.join(".config/Code/User/globalStorage/rooveterinaryinc.roo-cline/tasks");
             fs::create_dir_all(&roo_dir).unwrap();
             fs::write(
                 roo_dir.join("ui_messages.json"),
@@ -246,8 +249,7 @@ mod tests {
             assert_eq!(res[0].cache_output, 5.0);
             assert_eq!(res[0].agent, "build");
 
-            let kilo_dir = home
-                .join(".config/Code/User/globalStorage/kilocode.kilo-code/tasks");
+            let kilo_dir = home.join(".config/Code/User/globalStorage/kilocode.kilo-code/tasks");
             fs::create_dir_all(&kilo_dir).unwrap();
             fs::write(
                 kilo_dir.join("ui_messages.json"),

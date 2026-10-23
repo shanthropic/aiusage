@@ -1,9 +1,8 @@
 use crate::cache::cached_file_messages;
 use crate::common::{
-    build_raw_message, extract_f64, file_modified_timestamp_ms, file_predates_range,
-    filter_messages_by_date_range, infer_provider_from_model, normalize_tokens,
-    parse_timestamp_str, parse_timestamp_value, resolve_home, scan_directory, DateRange,
-    RawUsageMessage,
+    DateRange, RawUsageMessage, build_raw_message, extract_f64, file_modified_timestamp_ms,
+    file_predates_range, filter_messages_by_date_range, infer_provider_from_model,
+    normalize_tokens, parse_timestamp_str, parse_timestamp_value, resolve_home, scan_directory,
 };
 use chrono::{Local, NaiveDate, TimeZone};
 use rayon::prelude::*;
@@ -185,9 +184,7 @@ fn parse_amp_file(path: &Path) -> Vec<RawUsageMessage> {
         let mut search_start = 0;
         let mut unmatched = Vec::new();
         for mr in message_records {
-            if let Some(idx) =
-                find_matching_ledger(&ledger_records, &consumed, search_start, &mr)
-            {
+            if let Some(idx) = find_matching_ledger(&ledger_records, &consumed, search_start, &mr) {
                 consumed[idx] = true;
                 search_start = idx + 1;
                 if !ledger_records[idx].has_explicit_timestamp {
@@ -360,7 +357,9 @@ fn parse_codebuff_file(path: &Path) -> Vec<RawUsageMessage> {
             .or_else(|| chat_id_ts.filter(|&t| t > 0.0))
             .unwrap_or(file_mtime);
 
-        let model = usage.model.unwrap_or_else(|| "codebuff-unknown".to_string());
+        let model = usage
+            .model
+            .unwrap_or_else(|| "codebuff-unknown".to_string());
         let provider = infer_provider_from_model(&model);
         results.push(build_raw_message(
             "codebuff",
@@ -752,7 +751,10 @@ fn parse_mux_file(path: &Path) -> Vec<RawUsageMessage> {
             continue;
         }
         let (provider, model_id) = match model_key.find(':') {
-            Some(idx) => (model_key[..idx].to_string(), model_key[idx + 1..].to_string()),
+            Some(idx) => (
+                model_key[..idx].to_string(),
+                model_key[idx + 1..].to_string(),
+            ),
             None => (String::new(), model_key),
         };
         messages.push(build_raw_message(

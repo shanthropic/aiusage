@@ -1,8 +1,8 @@
 use crate::cache::cached_file_messages;
 use crate::common::{
-    build_raw_message, derive_agent, filter_messages_by_date_range, normalize_tokens,
-    normalize_workspace_key, resolve_home, scan_directory, workspace_label_from_key, DateRange,
-    RawUsageMessage,
+    DateRange, RawUsageMessage, build_raw_message, derive_agent, filter_messages_by_date_range,
+    normalize_tokens, normalize_workspace_key, resolve_home, scan_directory,
+    workspace_label_from_key,
 };
 use rayon::prelude::*;
 use rusqlite::{Connection, OpenFlags};
@@ -69,7 +69,9 @@ pub fn parse_opencode(range: DateRange) -> Vec<RawUsageMessage> {
     let files = scan_directory(&legacy_dir, "*.json");
     let results: Vec<RawUsageMessage> = files
         .into_par_iter()
-        .flat_map(|path| cached_file_messages(&path, || parse_opencode_file(&path).into_iter().collect()))
+        .flat_map(|path| {
+            cached_file_messages(&path, || parse_opencode_file(&path).into_iter().collect())
+        })
         .collect();
     filter_messages_by_date_range(results, range)
 }
@@ -164,7 +166,9 @@ fn parse_opencode_sqlite(db_path: &Path) -> Vec<RawUsageMessage> {
             let Some(model_id) = r.0.filter(|s| !s.is_empty()) else {
                 continue;
             };
-            let provider = r.1.filter(|s| !s.is_empty()).unwrap_or_else(|| "unknown".to_string());
+            let provider =
+                r.1.filter(|s| !s.is_empty())
+                    .unwrap_or_else(|| "unknown".to_string());
             let resolved_agent = resolve_opencode_agent(r.2.as_deref(), r.3.as_deref());
             let ws_key = r.5.as_deref().and_then(normalize_workspace_key);
             let ws_label = ws_key.as_deref().and_then(workspace_label_from_key);
@@ -250,18 +254,33 @@ fn resolve_opencode_agent(mode: Option<&str>, agent: Option<&str>) -> String {
 fn normalize_opencode_agent_name(agent: &str) -> String {
     let cleaned = agent.trim();
     match cleaned.to_lowercase().as_str() {
-        "sisyphus (ultraworker)" | "sisyphus - ultraworker" | "sisyphus ultraworker"
+        "sisyphus (ultraworker)"
+        | "sisyphus - ultraworker"
+        | "sisyphus ultraworker"
         | "sisyphus" => "Sisyphus".to_string(),
-        "hephaestus (deep agent)" | "hephaestus - deep agent" | "hephaestus deep agent"
+        "hephaestus (deep agent)"
+        | "hephaestus - deep agent"
+        | "hephaestus deep agent"
         | "hephaestus" => "Hephaestus".to_string(),
-        "prometheus (plan builder)" | "prometheus - plan builder" | "prometheus plan builder"
-        | "prometheus (planner)" | "prometheus" => "Prometheus".to_string(),
-        "atlas (plan executor)" | "atlas - plan executor" | "atlas plan executor" | "atlas"
+        "prometheus (plan builder)"
+        | "prometheus - plan builder"
+        | "prometheus plan builder"
+        | "prometheus (planner)"
+        | "prometheus" => "Prometheus".to_string(),
+        "atlas (plan executor)"
+        | "atlas - plan executor"
+        | "atlas plan executor"
+        | "atlas"
         | "orchestrator-sisyphus" => "Atlas".to_string(),
-        "metis (plan consultant)" | "metis - plan consultant" | "metis plan consultant"
+        "metis (plan consultant)"
+        | "metis - plan consultant"
+        | "metis plan consultant"
         | "metis" => "Metis".to_string(),
-        "momus (plan critic)" | "momus - plan critic" | "momus plan critic"
-        | "momus (plan reviewer)" | "momus" => "Momus".to_string(),
+        "momus (plan critic)"
+        | "momus - plan critic"
+        | "momus plan critic"
+        | "momus (plan reviewer)"
+        | "momus" => "Momus".to_string(),
         "sisyphus-junior" => "Sisyphus-Junior".to_string(),
         "planner-sisyphus" => "Planner-Sisyphus".to_string(),
         _ => derive_agent(Some(cleaned)),

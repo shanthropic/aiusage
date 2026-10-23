@@ -1,10 +1,10 @@
 use crate::cache::cached_file_messages;
 use crate::common::{
-    build_raw_message, canonical_provider, derive_agent, extract_i64, extract_string,
-    file_modified_timestamp_ms, file_predates_range, filter_messages_by_date_range,
-    infer_provider_from_model, normalize_agent_name, normalize_tokens, normalize_workspace_key,
-    parse_timestamp_value, resolve_home, scan_directory, workspace_label_from_key, DateRange,
-    RawUsageMessage, Tokens,
+    DateRange, RawUsageMessage, Tokens, build_raw_message, canonical_provider, derive_agent,
+    extract_i64, extract_string, file_modified_timestamp_ms, file_predates_range,
+    filter_messages_by_date_range, infer_provider_from_model, normalize_agent_name,
+    normalize_tokens, normalize_workspace_key, parse_timestamp_value, resolve_home, scan_directory,
+    workspace_label_from_key,
 };
 use memchr::memmem;
 use rayon::prelude::*;
@@ -159,8 +159,7 @@ fn parse_codex_file(path: &Path) -> Vec<RawUsageMessage> {
                             } else {
                                 state.session_agent.as_deref()
                             };
-                            let provider =
-                                state.session_provider.as_deref().unwrap_or("openai");
+                            let provider = state.session_provider.as_deref().unwrap_or("openai");
                             let msg = build_codex_message(
                                 state.current_model.as_deref().unwrap_or("unknown"),
                                 provider,
@@ -183,8 +182,7 @@ fn parse_codex_file(path: &Path) -> Vec<RawUsageMessage> {
         }
 
         if !handled {
-            if let Some(mut headless) =
-                parse_codex_headless_entry(&entry, &mut state, fallback_ts)
+            if let Some(mut headless) = parse_codex_headless_entry(&entry, &mut state, fallback_ts)
             {
                 headless.project_name = state.session_workspace_label.clone();
                 headless.project_path = state.session_workspace_key.clone();
@@ -231,8 +229,16 @@ fn extract_codex_model(payload: &serde_json::Map<String, Value>) -> Option<Strin
 }
 
 fn totals_from_usage(u: &serde_json::Map<String, Value>) -> CodexTotals {
-    let input = u.get("input_tokens").and_then(extract_i64).unwrap_or(0).max(0);
-    let output = u.get("output_tokens").and_then(extract_i64).unwrap_or(0).max(0);
+    let input = u
+        .get("input_tokens")
+        .and_then(extract_i64)
+        .unwrap_or(0)
+        .max(0);
+    let output = u
+        .get("output_tokens")
+        .and_then(extract_i64)
+        .unwrap_or(0)
+        .max(0);
     let cached_in = u
         .get("cached_input_tokens")
         .and_then(extract_i64)
@@ -323,7 +329,13 @@ fn looks_like_stale_regression(curr: CodexTotals, prev: CodexTotals, lst: CodexT
 
 fn totals_to_tokens(t: CodexTotals) -> Tokens {
     let clamped_cached = t.cached.min(t.input);
-    normalize_tokens(t.input - clamped_cached, t.output, clamped_cached, 0, t.reasoning)
+    normalize_tokens(
+        t.input - clamped_cached,
+        t.output,
+        clamped_cached,
+        0,
+        t.reasoning,
+    )
 }
 
 fn build_codex_message(
@@ -485,7 +497,10 @@ mod tests {
             assert_eq!(res[0].output, 30.0);
             assert_eq!(res[0].cache_input, 20.0);
             assert_eq!(res[0].reasoning, 5.0);
-            assert_eq!(res[0].project_path.as_deref(), Some("/Users/alice/codex-demo"));
+            assert_eq!(
+                res[0].project_path.as_deref(),
+                Some("/Users/alice/codex-demo")
+            );
             assert_eq!(res[1].input, 8.0);
             assert_eq!(res[1].output, 3.0);
             assert_eq!(res[1].cache_input, 2.0);

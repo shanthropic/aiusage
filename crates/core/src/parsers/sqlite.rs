@@ -1,9 +1,9 @@
 use crate::cache::cached_file_messages;
 use crate::common::{
-    build_raw_message, canonical_provider, extract_i64, file_modified_timestamp_ms,
-    file_predates_range, filter_messages_by_date_range, infer_provider_from_model,
-    normalize_tokens, parse_timestamp_str, resolve_home, workspace_label_from_key, DateRange,
-    RawUsageMessage,
+    DateRange, RawUsageMessage, build_raw_message, canonical_provider, extract_i64,
+    file_modified_timestamp_ms, file_predates_range, filter_messages_by_date_range,
+    infer_provider_from_model, normalize_tokens, parse_timestamp_str, resolve_home,
+    workspace_label_from_key,
 };
 use chrono::{Datelike, Local, TimeZone};
 use rayon::prelude::*;
@@ -138,10 +138,7 @@ fn parse_copilot_jsonl(path: &Path) -> Vec<RawUsageMessage> {
             line_buf.clear();
             continue;
         };
-        let is_chat = attrs
-            .get("gen_ai.operation.name")
-            .and_then(|v| v.as_str())
-            == Some("chat")
+        let is_chat = attrs.get("gen_ai.operation.name").and_then(|v| v.as_str()) == Some("chat")
             || span
                 .get("name")
                 .and_then(|v| v.as_str())
@@ -179,7 +176,13 @@ fn parse_copilot_jsonl(path: &Path) -> Vec<RawUsageMessage> {
             .max(0);
 
         let cr_for_in = cache_read.min(input);
-        let tokens = normalize_tokens(input - cr_for_in, output, cache_read, cache_write, reasoning);
+        let tokens = normalize_tokens(
+            input - cr_for_in,
+            output,
+            cache_read,
+            cache_write,
+            reasoning,
+        );
         if tokens.input == 0
             && tokens.output == 0
             && tokens.cache_input == 0
@@ -208,14 +211,7 @@ fn parse_copilot_jsonl(path: &Path) -> Vec<RawUsageMessage> {
             .unwrap_or(fallback_ts);
 
         messages.push(build_raw_message(
-            "copilot",
-            "default",
-            ts,
-            model,
-            provider,
-            tokens,
-            None,
-            None,
+            "copilot", "default", ts, model, provider, tokens, None, None,
         ));
         line_buf.clear();
     }
@@ -295,11 +291,10 @@ fn parse_hermes_db(db_path: &Path) -> Vec<RawUsageMessage> {
         if r.3 + r.4 + r.5 + r.6 + r.7 == 0 {
             continue;
         }
-        let provider = r
-            .1
-            .as_deref()
-            .and_then(|bp| canonical_provider(bp.trim()))
-            .unwrap_or_else(|| infer_provider_from_model(&r.0));
+        let provider =
+            r.1.as_deref()
+                .and_then(|bp| canonical_provider(bp.trim()))
+                .unwrap_or_else(|| infer_provider_from_model(&r.0));
         let ts = if r.2 > 1e12 { r.2 } else { r.2 * 1000.0 };
         messages.push(build_raw_message(
             "hermes",
@@ -329,7 +324,10 @@ pub fn parse_goose(range: DateRange) -> Vec<RawUsageMessage> {
         resolve_home("~/.local/share/Block/goose/sessions/sessions.db"),
     ];
     if let Ok(root) = env::var("GOOSE_PATH_ROOT") {
-        paths.insert(0, PathBuf::from(format!("{root}/data/sessions/sessions.db")));
+        paths.insert(
+            0,
+            PathBuf::from(format!("{root}/data/sessions/sessions.db")),
+        );
     }
 
     for db_path in paths {
@@ -384,20 +382,23 @@ fn parse_goose_db(db_path: &Path) -> Vec<RawUsageMessage> {
         if model_id.is_empty() || (r.3 == 0 && r.4 == 0 && r.5 == 0) {
             continue;
         }
-        let provider = r
-            .1
-            .as_deref()
-            .and_then(|p| canonical_provider(p.trim()))
-            .unwrap_or_else(|| {
-                let inf = infer_provider_from_model(&model_id);
-                if inf.is_empty() {
-                    "goose".to_string()
-                } else {
-                    inf
-                }
-            });
+        let provider =
+            r.1.as_deref()
+                .and_then(|p| canonical_provider(p.trim()))
+                .unwrap_or_else(|| {
+                    let inf = infer_provider_from_model(&model_id);
+                    if inf.is_empty() {
+                        "goose".to_string()
+                    } else {
+                        inf
+                    }
+                });
         let raw_ts = parse_timestamp_str(&r.2).unwrap_or(0.0);
-        let ts = if raw_ts > 1e12 { raw_ts } else { raw_ts * 1000.0 };
+        let ts = if raw_ts > 1e12 {
+            raw_ts
+        } else {
+            raw_ts * 1000.0
+        };
         let reasoning = if r.5 > r.3 + r.4 { r.5 - r.3 - r.4 } else { 0 };
 
         messages.push(build_raw_message(
@@ -471,10 +472,9 @@ fn parse_kilo_db(db_path: &Path) -> Vec<RawUsageMessage> {
         let Some(model_id) = r.0.filter(|s| !s.is_empty()) else {
             continue;
         };
-        let provider = r
-            .1
-            .filter(|s| !s.is_empty())
-            .unwrap_or_else(|| infer_provider_from_model(&model_id));
+        let provider =
+            r.1.filter(|s| !s.is_empty())
+                .unwrap_or_else(|| infer_provider_from_model(&model_id));
         let agent = if r.2.is_some() || r.3.is_some() {
             "agent"
         } else {
@@ -646,7 +646,12 @@ fn norm_crush_ts(raw: f64) -> Option<f64> {
 
 fn local_day_key(ts_ms: f64) -> Option<String> {
     let dt = Local.timestamp_millis_opt(ts_ms as i64).single()?;
-    Some(format!("{:04}-{:02}-{:02}", dt.year(), dt.month(), dt.day()))
+    Some(format!(
+        "{:04}-{:02}-{:02}",
+        dt.year(),
+        dt.month(),
+        dt.day()
+    ))
 }
 
 // ─── Synthetic (Octofriend) ──────────────────────────────────────────────────
@@ -696,7 +701,8 @@ fn parse_synthetic_db(db_path: &Path) -> Vec<RawUsageMessage> {
                 r.get::<_, i64>(4).unwrap_or(0).max(0),
                 r.get::<_, i64>(5).unwrap_or(0).max(0),
                 r.get::<_, f64>(6).unwrap_or(0.0),
-                r.get::<_, String>(7).unwrap_or_else(|_| "synthetic".to_string()),
+                r.get::<_, String>(7)
+                    .unwrap_or_else(|_| "synthetic".to_string()),
             ))
         }) {
             for r in rows.flatten() {
@@ -803,9 +809,11 @@ fn parse_antigravity_db(path: &Path) -> Vec<RawUsageMessage> {
         return Vec::new();
     };
     let traj_blob: Option<Vec<u8>> = conn
-        .query_row("SELECT data FROM trajectory_metadata_blob LIMIT 1", [], |r| {
-            r.get(0)
-        })
+        .query_row(
+            "SELECT data FROM trajectory_metadata_blob LIMIT 1",
+            [],
+            |r| r.get(0),
+        )
         .ok();
     let session_ts = traj_blob
         .as_deref()
@@ -1099,7 +1107,10 @@ mod tests {
             assert_eq!(db_res[0].provider, "openai");
             assert_eq!(db_res[0].input, 13296.0);
             assert_eq!(db_res[0].project_name.as_deref(), Some("project"));
-            assert_eq!(db_res[0].project_path.as_deref(), Some("/Users/test/project"));
+            assert_eq!(
+                db_res[0].project_path.as_deref(),
+                Some("/Users/test/project")
+            );
         });
     }
 

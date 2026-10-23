@@ -1,8 +1,8 @@
 use crate::cache::cached_file_messages;
 use crate::common::{
-    build_raw_message, file_modified_timestamp_ms, file_predates_range,
+    DateRange, RawUsageMessage, build_raw_message, file_modified_timestamp_ms, file_predates_range,
     filter_messages_by_date_range, normalize_tokens, normalize_workspace_key, parse_timestamp_str,
-    resolve_home, scan_directory, workspace_label_from_key, DateRange, RawUsageMessage,
+    resolve_home, scan_directory, workspace_label_from_key,
 };
 use memchr::memmem;
 use rayon::prelude::*;
@@ -108,7 +108,10 @@ fn parse_kimi_file(path: &Path) -> Vec<RawUsageMessage> {
 }
 
 fn read_kimi_model_from_config(wire_path: &Path) -> String {
-    if let Some(sessions_dir) = wire_path.parent().and_then(|p| p.parent()).and_then(|p| p.parent())
+    if let Some(sessions_dir) = wire_path
+        .parent()
+        .and_then(|p| p.parent())
+        .and_then(|p| p.parent())
     {
         let config_path = sessions_dir.join("config.json");
         if let Ok(text) = fs::read_to_string(config_path) {

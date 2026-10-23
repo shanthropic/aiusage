@@ -180,7 +180,11 @@ pub fn parse_timestamp_str(s: &str) -> Option<f64> {
         if let Ok(dt) = DateTime::parse_from_rfc3339(trimmed) {
             return Some(dt.timestamp_millis() as f64);
         }
-        for fmt in ["%Y-%m-%dT%H:%M:%S%.f", "%Y-%m-%dT%H:%M:%S", "%Y-%m-%d %H:%M:%S"] {
+        for fmt in [
+            "%Y-%m-%dT%H:%M:%S%.f",
+            "%Y-%m-%dT%H:%M:%S",
+            "%Y-%m-%d %H:%M:%S",
+        ] {
             if let Ok(ndt) = NaiveDateTime::parse_from_str(trimmed, fmt) {
                 if let Some(ldt) = Local.from_local_datetime(&ndt).single() {
                     return Some(ldt.timestamp_millis() as f64);
@@ -196,7 +200,11 @@ pub fn parse_timestamp_str(s: &str) -> Option<f64> {
     }
     if let Ok(n) = trimmed.parse::<f64>() {
         if n > 0.0 {
-            return Some(if n >= 1_000_000_000_000.0 { n } else { n * 1000.0 });
+            return Some(if n >= 1_000_000_000_000.0 {
+                n
+            } else {
+                n * 1000.0
+            });
         }
     }
     None
@@ -210,7 +218,11 @@ pub fn parse_timestamp_value(val: &Value) -> Option<f64> {
             if v <= 0.0 {
                 return None;
             }
-            Some(if v >= 1_000_000_000_000.0 { v } else { v * 1000.0 })
+            Some(if v >= 1_000_000_000_000.0 {
+                v
+            } else {
+                v * 1000.0
+            })
         }
         Value::Array(arr) if arr.len() >= 2 => {
             let secs = parse_timestamp_value(&arr[0])?;
@@ -467,8 +479,8 @@ pub mod test_support {
     use std::env;
     use std::fs::{self, File};
     use std::path::{Path, PathBuf};
-    use std::sync::atomic::{AtomicU64, Ordering};
     use std::sync::Mutex;
+    use std::sync::atomic::{AtomicU64, Ordering};
     use std::time::{Duration, UNIX_EPOCH};
 
     static ENV_LOCK: Mutex<()> = Mutex::new(());
