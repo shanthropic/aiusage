@@ -5,6 +5,16 @@
   "bin": {
     "mytokens": "dist/index.js"
   },
+  "napi": {
+    "binaryName": "mytokens-core",
+    "targets": [
+      "x86_64-apple-darwin",
+      "aarch64-apple-darwin",
+      "x86_64-unknown-linux-gnu",
+      "aarch64-unknown-linux-gnu",
+      "x86_64-pc-windows-msvc"
+    ]
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/NazmusSayad/mytokens.git"
@@ -17,7 +27,9 @@
     "export:watch": "tsx --watch ./src/index.ts export",
     "image": "tsx ./src/index.ts image",
     "image:watch": "tsx --watch ./src/index.ts image",
-    "build": "tsdown --config ./tsdown.config.ts",
+    "build:rust": "napi build --platform --release --manifest-path ./crates/core/Cargo.toml",
+    "build:rust:debug": "napi build --platform --manifest-path ./crates/core/Cargo.toml",
+    "build": "pnpm run build:rust && tsdown --config ./tsdown.config.ts",
     "build:watch": "tsdown --config ./tsdown.config.ts --watch",
     "typecheck": "tsc --noEmit",
     "typecheck:watch": "tsc --noEmit --watch",
@@ -32,12 +44,11 @@
   "devDependencies": {
     "@commander-js/extra-typings": "^14.0.0",
     "@inquirer/core": "^11.2.1",
-    "@inquirer/prompts": "^8.5.2",
+    "@napi-rs/cli": "^3.10.8",
     "@types/ms": "^2.1.0",
     "@types/node": "^24.13.3",
     "chalk": "^5.6.2",
     "commander": "^14.0.3",
-    "concurrently": "^9.2.4",
     "eslint-plugin-check-file": "^3.3.2",
     "eslint-plugin-oxfmt": "^0.28.0",
     "fuse.js": "^7.5.0",
@@ -47,7 +58,6 @@
     "oxlint": "^1.88.0",
     "oxlint-tsgolint": "^7.0.2004",
     "rolldown": "1.0.0-rc.13",
-    "table": "^6.9.0",
     "terminal-image": "^5.0.1",
     "tsdown": "^0.15.12",
     "tslib": "^2.8.1",

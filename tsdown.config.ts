@@ -13,7 +13,11 @@ export default defineConfig({
   target: 'ES6',
   minify: true,
 
-  external: [/node:/gim, ...getExternal((packageJSON as any).dependencies)],
+  external: [
+    /node:/gim,
+    /\.node$/i,
+    ...getExternal((packageJSON as any).dependencies),
+  ],
 })
 
 function getExternal(dependencies: unknown) {
