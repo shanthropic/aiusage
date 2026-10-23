@@ -106,7 +106,7 @@ jobs:
           npm exec --offline -- aiusage cache --help
           node --input-type=module <<'JS'
           import assert from 'node:assert/strict'
-          import { readdirSync, readFileSync } from 'node:fs'
+          import { readdirSync } from 'node:fs'
           import { createRequire } from 'node:module'
           const require = createRequire(process.cwd() + '/node_modules/aiusage/package.json')
           const p = require('./package.json')

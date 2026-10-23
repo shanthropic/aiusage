@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "description": "Local coding-agent usage and cost reports, powered by Rust",
   "type": "module",
+  "main": "native/binding.cjs",
   "packageManager": "pnpm@12.15.0",
   "engines": {
     "node": ">=22.13.0"
