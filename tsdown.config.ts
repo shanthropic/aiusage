@@ -15,6 +15,7 @@ export default defineConfig({
 
   external: [
     /node:/gim,
+    /native\/binding\.cjs$/,
     /\.node$/i,
     ...getExternal((packageJSON as any).dependencies),
   ],

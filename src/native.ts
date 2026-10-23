@@ -1,7 +1,5 @@
 import type { UsageDataMessage } from '@/core/types.js'
 import { createRequire } from 'node:module'
-import { dirname, join } from 'node:path'
-import { fileURLToPath } from 'node:url'
 
 export type DateRange = {
   from: Date | null
@@ -50,30 +48,7 @@ interface NativeBinding {
 }
 
 const require = createRequire(import.meta.url)
-const currentDir = dirname(fileURLToPath(import.meta.url))
-
-function loadBinding(): NativeBinding {
-  const candidates = [
-    join(currentDir, '..', 'mytokens-core.node'),
-    join(currentDir, 'mytokens-core.node'),
-  ]
-  for (const candidate of candidates) {
-    try {
-      return require(candidate) as NativeBinding
-    } catch {
-      // try next path or platform triple
-    }
-  }
-  return require(
-    join(
-      currentDir,
-      '..',
-      `mytokens-core.${process.platform}-${process.arch}.node`
-    )
-  ) as NativeBinding
-}
-
-const binding = loadBinding()
+const binding = require('../native/binding.cjs') as NativeBinding
 
 export async function loadUsageData(
   range?: DateRange
