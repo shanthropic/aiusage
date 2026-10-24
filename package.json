@@ -49,7 +49,8 @@
     "lint": "oxlint .",
     "lint:fix": "oxlint . --fix",
     "test": "vitest run",
-    "test:watch": "vitest watch"
+    "test:watch": "vitest watch",
+    "bench": "node bench/run.mjs"
   },
   "dependencies": {
     "@resvg/resvg-js": "^2.6.2"
