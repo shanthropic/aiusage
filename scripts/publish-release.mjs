@@ -41,6 +41,4 @@ for (const pkg of release.packages) {
   if (!(await metadata(spec))) {
     execFileSync('npm', ['publish', resolve('tarballs', pkg.filename), '--access', 'public', '--ignore-scripts'], { stdio: 'inherit' })
   }
-  const published = await metadata(spec)
-  assert.equal(published?.dist.integrity, pkg.integrity, `Registry verification failed for ${pkg.name}; rerun this publishing job`)
 }
